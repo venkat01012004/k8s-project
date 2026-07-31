@@ -1,21 +1,39 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
+
 metadata:
-  name: job-portal-ingress
+  name: app-scanner
+  namespace: scanner
+
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/proxy-body-size: "5m"
+    kubernetes.io/ingress.class: alb
+
+    alb.ingress.kubernetes.io/scheme: internet-facing
+
+    alb.ingress.kubernetes.io/target-type: ip
+
+    # BOTH 80 and 443
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
+
+    # Redirect HTTP -> HTTPS
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+
+    # ACM Certificate ARN
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-south-1:176285591771:certificate/3b5c4e17-32eb-4455-9ec9-7ca287d941a3
+
 spec:
-  ingressClassName: nginx
+  ingressClassName: alb
+
   rules:
-    - host: jobportal.local
+    - host: venkat.fun
+
       http:
         paths:
           - path: /
             pathType: Prefix
+
             backend:
               service:
-                name: job-portal-service
+                name: app-scanner
                 port:
                   number: 80
