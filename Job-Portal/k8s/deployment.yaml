@@ -1,98 +1,37 @@
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
-  name: job-portal-deployment
+  name: app-scanner
+  namespace: scanner
   labels:
-    app: job-portal
+    app: frontend
+
 spec:
-  replicas: 3
+  replicas: 1
+
   selector:
     matchLabels:
-      app: job-portal
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
+      app: frontend
+
   template:
     metadata:
       labels:
-        app: job-portal
+        app: frontend
+
     spec:
       containers:
-        - name: job-portal
-          image: <YOUR_DOCKERHUB_USERNAME>/job-portal:latest
-          imagePullPolicy: Always
+        - name: app-scanner
+          image: 176285591771.dkr.ecr.ap-south-1.amazonaws.com/venkat-k8s:IMAGE_TAG
+
           ports:
-            - containerPort: 5000
-          env:
-            - name: SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: job-portal-secrets
-                  key: SECRET_KEY
-            - name: DB_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: job-portal-secrets
-                  key: DB_HOST
-            - name: DB_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: job-portal-secrets
-                  key: DB_PORT
-            - name: DB_USER
-              valueFrom:
-                secretKeyRef:
-                  name: job-portal-secrets
-                  key: DB_USER
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: job-portal-secrets
-                  key: DB_PASSWORD
-            - name: DB_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: job-portal-secrets
-                  key: DB_NAME
-            - name: FLASK_DEBUG
-              value: "false"
+            - containerPort: 5050
+
           resources:
             requests:
-              cpu: "150m"
-              memory: "192Mi"
+              memory: "64Mi"
+              cpu: "250m"
+
             limits:
+              memory: "128Mi"
               cpu: "500m"
-              memory: "384Mi"
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 5000
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            timeoutSeconds: 3
-            failureThreshold: 3
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 5000
-            initialDelaySeconds: 20
-            periodSeconds: 20
-            timeoutSeconds: 3
-            failureThreshold: 3
-          volumeMounts:
-            - name: uploads-volume
-              mountPath: /app/static/uploads
-      volumes:
-        - name: uploads-volume
-          emptyDir: {}
----
-# NOTE: Create the referenced secret before applying this deployment, e.g.:
-#   kubectl create secret generic job-portal-secrets \
-#     --from-literal=SECRET_KEY='your-production-secret' \
-#     --from-literal=DB_HOST='mysql-service' \
-#     --from-literal=DB_PORT='3306' \
-#     --from-literal=DB_USER='root' \
-#     --from-literal=DB_PASSWORD='your-db-password' \
-#     --from-literal=DB_NAME='job_portal'
