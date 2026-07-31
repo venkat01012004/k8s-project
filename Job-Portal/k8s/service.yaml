@@ -1,15 +1,19 @@
 apiVersion: v1
 kind: Service
+
 metadata:
-  name: job-portal-service
+  name: app-scanner
+  namespace: scanner
   labels:
-    app: job-portal
+    app: frontend
+
 spec:
-  type: ClusterIP
-  selector:
-    app: job-portal
   ports:
-    - name: http
-      protocol: TCP
+    - protocol: TCP
       port: 80
-      targetPort: 5000
+      targetPort: 5050
+
+  selector:
+    app: frontend
+
+  type: LoadBalancer
