@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Apply — {{ job.title }} — JobNest{% endblock %}
+
+{% block content %}
+<div class="auth-wrap" style="background:linear-gradient(160deg, var(--navy-900) 0%, var(--navy-800) 30%, var(--bg) 30%);">
+  <div class="auth-card fade-up" style="max-width:560px;">
+    <h2>Apply for {{ job.title }}</h2>
+    <p class="auth-sub">at {{ job.company_name }} · {{ job.location }}</p>
+
+    <form method="POST" action="{{ url_for('apply_job', job_id=job.job_id) }}" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="cover_letter">Cover letter (optional)</label>
+        <textarea id="cover_letter" name="cover_letter" class="form-control" placeholder="Tell the recruiter why you're a great fit for this role..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="resume">Resume</label>
+        <div class="file-drop">
+          <span class="file-drop-text"><i class="fa-solid fa-cloud-arrow-up"></i> Upload PDF, DOC, or DOCX (leave blank to use your saved profile resume)</span>
+          <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" style="margin-top:10px;">
+        </div>
+        <p class="form-help">Max file size 5 MB. If you've already uploaded a resume to your profile, you can skip this.</p>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-paper-plane"></i> Submit Application</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Login — JobNest{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card fade-up">
+    <div class="role-toggle">
+      <a href="{{ url_for('login', role='candidate') }}" class="{{ 'active' if role=='candidate' }}">Candidate</a>
+      <a href="{{ url_for('login', role='recruiter') }}" class="{{ 'active' if role=='recruiter' }}">Recruiter</a>
+    </div>
+
+    <h2>Welcome back</h2>
+    <p class="auth-sub">
+      {% if role == 'recruiter' %}
+        Log in to manage your job postings and applicants.
+      {% else %}
+        Log in to continue your job search.
+      {% endif %}
+    </p>
+
+    <form method="POST" action="{{ url_for('login') }}" novalidate>
+      <input type="hidden" name="role" value="{{ role }}">
+      <div class="form-group">
+        <label for="email">Email address</label>
+        <input type="email" id="email" name="email" class="form-control" placeholder="you@example.com" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">
+        <i class="fa-solid fa-right-to-bracket"></i> Log In as {{ 'Recruiter' if role=='recruiter' else 'Candidate' }}
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      Don't have an account? <a href="{{ url_for('register', role=role) }}">Sign up here</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

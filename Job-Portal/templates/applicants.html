@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Applicants — JobNest{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="dash-layout">
+
+    <aside class="dash-sidebar">
+      <div class="dash-profile">
+        <img src="{{ url_for('static', filename='images/default-company.svg') }}" class="dash-avatar" alt="Company logo">
+        <div>
+          <div class="name">{{ user_name }}</div>
+          <div class="role">Recruiter</div>
+        </div>
+      </div>
+      <ul class="dash-nav">
+        <li><a href="{{ url_for('recruiter_dashboard') }}"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+        <li><a href="{{ url_for('post_job') }}"><i class="fa-solid fa-plus"></i> Post a Job</a></li>
+        <li><a href="{{ url_for('manage_jobs') }}"><i class="fa-solid fa-list-check"></i> Manage Jobs</a></li>
+        <li><a href="{{ url_for('applicants') }}" class="active"><i class="fa-solid fa-users"></i> View Applicants</a></li>
+        <li><a href="{{ url_for('recruiter_profile') }}"><i class="fa-regular fa-user"></i> Update Profile</a></li>
+        <li><a href="{{ url_for('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+      </ul>
+    </aside>
+
+    <div class="dash-main">
+      <div class="card">
+        <div class="card-header">
+          <h3>Applicants</h3>
+          <form method="GET" style="min-width:220px;">
+            <select class="form-control" onchange="window.location.href=this.value">
+              <option value="{{ url_for('applicants') }}" {{ 'selected' if not selected_job_id }}>All Jobs</option>
+              {% for job in jobs %}
+                <option value="{{ url_for('applicants', job_id=job.job_id) }}" {{ 'selected' if selected_job_id==job.job_id }}>{{ job.title }}</option>
+              {% endfor %}
+            </select>
+          </form>
+        </div>
+
+        {% if applicants %}
+          {% for app in applicants %}
+          <div class="applicant-card">
+            <img src="{{ url_for('static', filename='images/default-avatar.svg') }}" class="applicant-avatar" alt="{{ app.full_name }}">
+            <div class="applicant-info">
+              <strong>{{ app.full_name }}</strong>
+              <span class="badge badge-{{ app.status.lower() }}" style="margin-left:8px;">{{ app.status }}</span>
+              <div style="font-size:0.85rem; color:var(--slate-600); margin-top:4px;">
+                Applied for <strong>{{ app.job_title }}</strong> &middot; {{ app.applied_at.strftime('%b %d, %Y') }}
+              </div>
+              <div style="font-size:0.82rem; color:var(--slate-400); margin-top:4px;">
+                <i class="fa-regular fa-envelope"></i> {{ app.email }}
+                {% if app.phone %} &middot; <i class="fa-solid fa-phone"></i> {{ app.phone }}{% endif %}
+                {% if app.candidate_location %} &middot; <i class="fa-solid fa-location-dot"></i> {{ app.candidate_location }}{% endif %}
+              </div>
+              {% if app.skills %}
+              <div class="tag-row" style="margin-top:8px;">
+                {% for skill in app.skills.split(',')[:6] %}
+                  <span class="tag">{{ skill.strip() }}</span>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+            <div class="applicant-actions">
+              {% if app.resume_filename %}
+              <a href="{{ url_for('serve_resume', filename=app.resume_filename) }}" target="_blank" class="btn btn-ghost btn-sm"><i class="fa-solid fa-file-arrow-down"></i> Resume</a>
+              {% endif %}
+              <form method="POST" action="{{ url_for('update_application_status', application_id=app.application_id) }}">
+                <select name="status" class="form-control status-select" style="width:auto;">
+                  <option value="Pending" {{ 'selected' if app.status=='Pending' }}>Pending</option>
+                  <option value="Shortlisted" {{ 'selected' if app.status=='Shortlisted' }}>Shortlisted</option>
+                  <option value="Accepted" {{ 'selected' if app.status=='Accepted' }}>Accept</option>
+                  <option value="Rejected" {{ 'selected' if app.status=='Rejected' }}>Reject</option>
+                </select>
+              </form>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+        <div class="empty-state">
+          <div class="icon"><i class="fa-regular fa-user"></i></div>
+          <p>No applicants yet for this selection.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}Update Profile — JobNest{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="dash-layout">
+
+    <aside class="dash-sidebar">
+      <div class="dash-profile">
+        <img src="{{ url_for('static', filename='images/default-avatar.svg' if role=='candidate' else 'images/default-company.svg') }}" class="dash-avatar" alt="Profile">
+        <div>
+          <div class="name">{{ user_name }}</div>
+          <div class="role">{{ 'Candidate' if role=='candidate' else 'Recruiter' }}</div>
+        </div>
+      </div>
+      <ul class="dash-nav">
+        {% if role == 'candidate' %}
+          <li><a href="{{ url_for('candidate_dashboard') }}"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+          <li><a href="{{ url_for('jobs') }}"><i class="fa-solid fa-magnifying-glass"></i> Search Jobs</a></li>
+          <li><a href="{{ url_for('applied_jobs') }}"><i class="fa-solid fa-file-lines"></i> Applied Jobs</a></li>
+          <li><a href="{{ url_for('candidate_profile') }}" class="active"><i class="fa-regular fa-user"></i> Update Profile</a></li>
+        {% else %}
+          <li><a href="{{ url_for('recruiter_dashboard') }}"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+          <li><a href="{{ url_for('post_job') }}"><i class="fa-solid fa-plus"></i> Post a Job</a></li>
+          <li><a href="{{ url_for('manage_jobs') }}"><i class="fa-solid fa-list-check"></i> Manage Jobs</a></li>
+          <li><a href="{{ url_for('applicants') }}"><i class="fa-solid fa-users"></i> View Applicants</a></li>
+          <li><a href="{{ url_for('recruiter_profile') }}" class="active"><i class="fa-regular fa-user"></i> Update Profile</a></li>
+        {% endif %}
+        <li><a href="{{ url_for('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+      </ul>
+    </aside>
+
+    <div class="dash-main">
+      <div class="card">
+        <div class="card-header"><h3>Update Profile</h3></div>
+
+        {% if role == 'candidate' %}
+        <form method="POST" action="{{ url_for('candidate_profile') }}" enctype="multipart/form-data">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="full_name">Full Name</label>
+              <input type="text" id="full_name" name="full_name" class="form-control" value="{{ candidate.full_name }}" required>
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input type="text" id="phone" name="phone" class="form-control" value="{{ candidate.phone or '' }}">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="location">Location</label>
+              <input type="text" id="location" name="location" class="form-control" value="{{ candidate.location or '' }}" placeholder="e.g. Hyderabad, India">
+            </div>
+            <div class="form-group">
+              <label for="headline">Professional Headline</label>
+              <input type="text" id="headline" name="headline" class="form-control" value="{{ candidate.headline or '' }}" placeholder="e.g. Full Stack Developer">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="skills">Skills (comma-separated)</label>
+            <input type="text" id="skills" name="skills" class="form-control" value="{{ candidate.skills or '' }}" placeholder="Python, Flask, React">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="experience_years">Years of Experience</label>
+              <input type="number" step="0.5" id="experience_years" name="experience_years" class="form-control" value="{{ candidate.experience_years or 0 }}">
+            </div>
+            <div class="form-group">
+              <label for="education">Education</label>
+              <input type="text" id="education" name="education" class="form-control" value="{{ candidate.education or '' }}">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="linkedin_url">LinkedIn URL</label>
+            <input type="url" id="linkedin_url" name="linkedin_url" class="form-control" value="{{ candidate.linkedin_url or '' }}" placeholder="https://linkedin.com/in/yourname">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="resume">Resume (PDF, DOC, DOCX)</label>
+              <div class="file-drop">
+                <span class="file-drop-text"><i class="fa-solid fa-file-arrow-up"></i> {{ candidate.resume_filename or 'No resume uploaded yet' }}</span>
+                <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" style="margin-top:10px;">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="profile_photo">Profile Photo</label>
+              <div class="file-drop">
+                <span class="file-drop-text"><i class="fa-solid fa-image"></i> Upload a photo</span>
+                <input type="file" id="profile_photo" name="profile_photo" accept=".png,.jpg,.jpeg,.gif,.webp" style="margin-top:10px;">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
+        </form>
+
+        {% else %}
+        <form method="POST" action="{{ url_for('recruiter_profile') }}" enctype="multipart/form-data">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="company_name">Company Name</label>
+              <input type="text" id="company_name" name="company_name" class="form-control" value="{{ recruiter.company_name }}" required>
+            </div>
+            <div class="form-group">
+              <label for="contact_person">Contact Person</label>
+              <input type="text" id="contact_person" name="contact_person" class="form-control" value="{{ recruiter.contact_person }}" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input type="text" id="phone" name="phone" class="form-control" value="{{ recruiter.phone or '' }}">
+            </div>
+            <div class="form-group">
+              <label for="industry">Industry</label>
+              <input type="text" id="industry" name="industry" class="form-control" value="{{ recruiter.industry or '' }}" placeholder="e.g. Information Technology">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="company_website">Company Website</label>
+            <input type="url" id="company_website" name="company_website" class="form-control" value="{{ recruiter.company_website or '' }}" placeholder="https://yourcompany.com">
+          </div>
+
+          <div class="form-group">
+            <label for="about_company">About Company</label>
+            <textarea id="about_company" name="about_company" class="form-control">{{ recruiter.about_company or '' }}</textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="company_logo">Company Logo</label>
+            <div class="file-drop">
+              <span class="file-drop-text"><i class="fa-solid fa-image"></i> Upload company logo</span>
+              <input type="file" id="company_logo" name="company_logo" accept=".png,.jpg,.jpeg,.gif,.webp" style="margin-top:10px;">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

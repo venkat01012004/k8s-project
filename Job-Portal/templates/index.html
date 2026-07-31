@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}JobNest — Find Your Next Opportunity{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <div class="eyebrow" style="color:#2FD3C4;">Career journeys start here</div>
+      <h1>Find a job that <span class="accent">moves you</span> forward.</h1>
+      <p class="lead">JobNest connects driven candidates with companies building what's next — from fast-growing startups to established enterprises. Search thousands of open roles in one place.</p>
+
+      <form class="hero-search" action="{{ url_for('jobs') }}" method="GET">
+        <input type="text" name="q" placeholder="Job title, keyword, or company">
+        <div class="divider"></div>
+        <input type="text" name="location" placeholder="City or 'Remote'">
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Search Jobs</button>
+      </form>
+
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="num">{{ total_jobs }}+</div>
+          <div class="label">Open Positions</div>
+        </div>
+        <div class="hero-stat">
+          <div class="num">{{ total_companies }}+</div>
+          <div class="label">Hiring Companies</div>
+        </div>
+        <div class="hero-stat">
+          <div class="num">{{ total_candidates }}+</div>
+          <div class="label">Registered Candidates</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-illustration">
+      <div class="hero-photo">
+        <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" alt="Team collaborating in a modern office">
+      </div>
+      <div class="floating-card card-1" style="top:-10px; left:-20px;">
+        <span class="dot"></span> New application shortlisted
+      </div>
+      <div class="floating-card card-2" style="bottom:70px; right:-30px;">
+        <i class="fa-solid fa-briefcase" style="color:#FF6B47;"></i> 240 new jobs this week
+      </div>
+      <div class="floating-card card-3" style="bottom:-10px; left:10px;">
+        <i class="fa-solid fa-circle-check" style="color:#12B5A6;"></i> Offer accepted 🎉
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-alt">
+  <div class="container">
+    <p style="text-align:center; color:var(--slate-400); font-size:0.82rem; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:24px;">Trusted by teams at growing companies</p>
+    <div class="logo-strip">
+      <img src="https://cdn.simpleicons.org/google/94A3B8" alt="Google">
+      <img src="https://cdn.simpleicons.org/microsoft/94A3B8" alt="Microsoft">
+      <img src="https://cdn.simpleicons.org/amazon/94A3B8" alt="Amazon">
+      <img src="https://cdn.simpleicons.org/spotify/94A3B8" alt="Spotify">
+      <img src="https://cdn.simpleicons.org/airbnb/94A3B8" alt="Airbnb">
+      <img src="https://cdn.simpleicons.org/salesforce/94A3B8" alt="Salesforce">
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">Fresh off the board</div>
+        <h2>Featured opportunities</h2>
+        <p class="section-sub">Hand-picked roles from companies actively hiring right now.</p>
+      </div>
+      <a href="{{ url_for('jobs') }}" class="btn btn-ghost">View all jobs <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+
+    {% if featured_jobs %}
+    <div class="grid grid-3">
+      {% for job in featured_jobs %}
+      <div class="job-card reveal">
+        <div class="job-card-top">
+          <div class="company-logo">{{ job.company_name[0] }}</div>
+          <div>
+            <h3>{{ job.title }}</h3>
+            <div class="company-name">{{ job.company_name }}</div>
+          </div>
+        </div>
+        <div class="tag-row">
+          <span class="tag tag-teal">{{ job.job_type }}</span>
+          <span class="tag">{{ job.experience_level }}</span>
+        </div>
+        <div class="meta">
+          <span><i class="fa-solid fa-location-dot"></i> {{ job.location }}</span>
+        </div>
+        <div class="job-card-footer">
+          <span class="salary">
+            {% if job.salary_min and job.salary_max %}
+              ₹{{ '{:,}'.format(job.salary_min) }} - ₹{{ '{:,}'.format(job.salary_max) }}
+            {% else %}
+              Salary not disclosed
+            {% endif %}
+          </span>
+          <a href="{{ url_for('job_details', job_id=job.job_id) }}" class="btn btn-ghost btn-sm">View</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="icon"><i class="fa-regular fa-face-frown"></i></div>
+      <p>No jobs posted yet. Check back soon!</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="section-alt">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <div class="eyebrow">How it works</div>
+        <h2>Two paths, one platform</h2>
+      </div>
+    </div>
+    <div class="grid grid-2">
+      <div class="card reveal">
+        <div class="stat-icon teal" style="margin-bottom:16px;"><i class="fa-solid fa-user-tie"></i></div>
+        <h3>For Candidates</h3>
+        <p class="section-sub">Create a profile, upload your resume, and apply to roles in a couple of clicks. Track every application status in one dashboard.</p>
+        <a href="{{ url_for('register', role='candidate') }}" class="btn btn-teal">Create Candidate Account</a>
+      </div>
+      <div class="card reveal">
+        <div class="stat-icon coral" style="margin-bottom:16px;"><i class="fa-solid fa-building"></i></div>
+        <h3>For Recruiters</h3>
+        <p class="section-sub">Post roles in minutes, review applicants with rich profiles, and move candidates through your pipeline with one click.</p>
+        <a href="{{ url_for('register', role='recruiter') }}" class="btn btn-primary">Create Recruiter Account</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Find Jobs — JobNest{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div class="container">
+    <div class="eyebrow" style="color:#2FD3C4;">{{ jobs|length }} open roles</div>
+    <h1>Find your next opportunity</h1>
+    <p>Search and filter through roles from companies actively hiring.</p>
+  </div>
+</div>
+
+<div class="container">
+  <form class="filter-bar" method="GET" action="{{ url_for('jobs') }}">
+    <input type="text" name="q" class="form-control" placeholder="Job title or company" value="{{ search }}">
+    <input type="text" name="location" class="form-control" placeholder="Location" value="{{ location }}">
+    <select name="category" class="form-control">
+      <option value="">All Categories</option>
+      {% for cat in categories %}
+        <option value="{{ cat }}" {{ 'selected' if category==cat }}>{{ cat }}</option>
+      {% endfor %}
+    </select>
+    <select name="job_type" class="form-control">
+      <option value="">All Job Types</option>
+      {% for jt in ['Full-Time','Part-Time','Internship','Contract','Remote'] %}
+        <option value="{{ jt }}" {{ 'selected' if job_type==jt }}>{{ jt }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-filter"></i> Filter</button>
+  </form>
+
+  {% if jobs %}
+  <div class="grid grid-3" style="margin-bottom:60px;">
+    {% for job in jobs %}
+    <div class="job-card reveal">
+      <div class="job-card-top">
+        <div class="company-logo">{{ job.company_name[0] }}</div>
+        <div>
+          <h3>{{ job.title }}</h3>
+          <div class="company-name">{{ job.company_name }}</div>
+        </div>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-teal">{{ job.job_type }}</span>
+        <span class="tag">{{ job.experience_level }}</span>
+        {% if job.category %}<span class="tag tag-coral">{{ job.category }}</span>{% endif %}
+      </div>
+      <div class="meta">
+        <span><i class="fa-solid fa-location-dot"></i> {{ job.location }}</span>
+        <span><i class="fa-regular fa-clock"></i> Posted {{ job.posted_at.strftime('%b %d, %Y') }}</span>
+      </div>
+      <div class="job-card-footer">
+        <span class="salary">
+          {% if job.salary_min and job.salary_max %}
+            ₹{{ '{:,}'.format(job.salary_min) }} - ₹{{ '{:,}'.format(job.salary_max) }}
+          {% else %}
+            Salary not disclosed
+          {% endif %}
+        </span>
+        <a href="{{ url_for('job_details', job_id=job.job_id) }}" class="btn btn-ghost btn-sm">View Details</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+    <h3>No jobs match your search</h3>
+    <p>Try adjusting your filters or search keywords.</p>
+    <a href="{{ url_for('jobs') }}" class="btn btn-ghost">Clear Filters</a>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

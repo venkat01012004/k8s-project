@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Manage Jobs — JobNest{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="dash-layout">
+
+    <aside class="dash-sidebar">
+      <div class="dash-profile">
+        <img src="{{ url_for('static', filename='images/default-company.svg') }}" class="dash-avatar" alt="Company logo">
+        <div>
+          <div class="name">{{ user_name }}</div>
+          <div class="role">Recruiter</div>
+        </div>
+      </div>
+      <ul class="dash-nav">
+        <li><a href="{{ url_for('recruiter_dashboard') }}"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+        <li><a href="{{ url_for('post_job') }}"><i class="fa-solid fa-plus"></i> Post a Job</a></li>
+        <li><a href="{{ url_for('manage_jobs') }}" class="active"><i class="fa-solid fa-list-check"></i> Manage Jobs</a></li>
+        <li><a href="{{ url_for('applicants') }}"><i class="fa-solid fa-users"></i> View Applicants</a></li>
+        <li><a href="{{ url_for('recruiter_profile') }}"><i class="fa-regular fa-user"></i> Update Profile</a></li>
+        <li><a href="{{ url_for('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+      </ul>
+    </aside>
+
+    <div class="dash-main">
+      <div class="card">
+        <div class="card-header">
+          <h3>Manage Jobs</h3>
+          <a href="{{ url_for('post_job') }}" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> Post New Job</a>
+        </div>
+
+        {% if jobs %}
+        <table class="data-table">
+          <thead>
+            <tr><th>Title</th><th>Location</th><th>Type</th><th>Vacancies</th><th>Applicants</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            {% for job in jobs %}
+            <tr>
+              <td><strong>{{ job.title }}</strong><br><span style="color:var(--slate-400); font-size:0.78rem;">Posted {{ job.posted_at.strftime('%b %d, %Y') }}</span></td>
+              <td>{{ job.location }}</td>
+              <td>{{ job.job_type }}</td>
+              <td>{{ job.vacancies }}</td>
+              <td><a href="{{ url_for('applicants', job_id=job.job_id) }}">{{ job.applicant_count }} applicant(s)</a></td>
+              <td><span class="badge badge-{{ 'open' if job.status=='Open' else 'closed' }}">{{ job.status }}</span></td>
+              <td>
+                <div style="display:flex; gap:6px;">
+                  <a href="{{ url_for('edit_job', job_id=job.job_id) }}" class="btn btn-ghost btn-sm"><i class="fa-solid fa-pen"></i></a>
+                  <form method="POST" action="{{ url_for('delete_job', job_id=job.job_id) }}" data-confirm="Delete this job posting? This cannot be undone.">
+                    <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+          <div class="icon"><i class="fa-regular fa-folder-open"></i></div>
+          <p>You haven't posted any jobs yet.</p>
+          <a href="{{ url_for('post_job') }}" class="btn btn-primary">Post Your First Job</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

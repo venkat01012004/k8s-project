@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}{{ job.title }} at {{ job.company_name }} — JobNest{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div class="container">
+    <div class="job-detail-header">
+      <div class="left">
+        <div class="company-logo" style="width:64px; height:64px; font-size:1.4rem; background:rgba(255,255,255,0.1); color:#fff;">{{ job.company_name[0] }}</div>
+        <div>
+          <h1 style="margin-bottom:4px;">{{ job.title }}</h1>
+          <p style="margin:0;">{{ job.company_name }} · {{ job.location }}</p>
+        </div>
+      </div>
+      <div>
+        {% if session.get('role') == 'candidate' %}
+          {% if already_applied %}
+            <button class="btn btn-outline" disabled><i class="fa-solid fa-circle-check"></i> Already Applied</button>
+          {% elif job.status == 'Open' %}
+            <a href="{{ url_for('apply_job', job_id=job.job_id) }}" class="btn btn-primary btn-lg">Apply Now <i class="fa-solid fa-arrow-right"></i></a>
+          {% else %}
+            <button class="btn btn-outline" disabled>Applications Closed</button>
+          {% endif %}
+        {% elif not logged_in %}
+          <a href="{{ url_for('login', role='candidate') }}" class="btn btn-primary">Login to Apply</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container" style="padding:48px 24px;">
+  <div class="grid" style="grid-template-columns: 2fr 1fr; gap:32px; align-items:flex-start;">
+    <div>
+      <div class="card">
+        <div class="tag-row" style="margin-bottom:20px;">
+          <span class="tag tag-teal">{{ job.job_type }}</span>
+          <span class="tag">{{ job.experience_level }}</span>
+          {% if job.category %}<span class="tag tag-coral">{{ job.category }}</span>{% endif %}
+          <span class="badge badge-{{ 'open' if job.status=='Open' else 'closed' }}">{{ job.status }}</span>
+        </div>
+
+        <h3>Job Description</h3>
+        <p style="color:var(--slate-600); white-space:pre-line;">{{ job.description }}</p>
+
+        {% if job.requirements %}
+        <h3 style="margin-top:24px;">Requirements</h3>
+        <p style="color:var(--slate-600); white-space:pre-line;">{{ job.requirements }}</p>
+        {% endif %}
+
+        {% if job.responsibilities %}
+        <h3 style="margin-top:24px;">Responsibilities</h3>
+        <p style="color:var(--slate-600); white-space:pre-line;">{{ job.responsibilities }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h3 style="margin-bottom:16px;">Job Overview</h3>
+        <div style="display:flex; flex-direction:column; gap:14px; font-size:0.9rem;">
+          <div style="display:flex; justify-content:space-between;"><span style="color:var(--slate-600);"><i class="fa-solid fa-location-dot"></i> Location</span><strong>{{ job.location }}</strong></div>
+          <div style="display:flex; justify-content:space-between;"><span style="color:var(--slate-600);"><i class="fa-solid fa-briefcase"></i> Job Type</span><strong>{{ job.job_type }}</strong></div>
+          <div style="display:flex; justify-content:space-between;"><span style="color:var(--slate-600);"><i class="fa-solid fa-chart-line"></i> Level</span><strong>{{ job.experience_level }}</strong></div>
+          <div style="display:flex; justify-content:space-between;"><span style="color:var(--slate-600);"><i class="fa-solid fa-users"></i> Vacancies</span><strong>{{ job.vacancies }}</strong></div>
+          <div style="display:flex; justify-content:space-between;">
+            <span style="color:var(--slate-600);"><i class="fa-solid fa-money-bill-wave"></i> Salary</span>
+            <strong>
+              {% if job.salary_min and job.salary_max %}₹{{ '{:,}'.format(job.salary_min) }} - ₹{{ '{:,}'.format(job.salary_max) }}{% else %}Not disclosed{% endif %}
+            </strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom:12px;">About {{ job.company_name }}</h3>
+        <p style="color:var(--slate-600); font-size:0.9rem;">{{ job.about_company or 'No company description provided.' }}</p>
+        {% if job.company_website %}
+        <a href="{{ job.company_website }}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" style="margin-top:10px;">Visit Website <i class="fa-solid fa-up-right-from-square"></i></a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
