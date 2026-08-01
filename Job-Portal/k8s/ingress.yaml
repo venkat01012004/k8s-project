@@ -25,7 +25,7 @@ spec:
   ingressClassName: alb
 
   rules:
-    - host: venkat.fun
+    - host: jobportal.venkat.fun
 
       http:
         paths:
