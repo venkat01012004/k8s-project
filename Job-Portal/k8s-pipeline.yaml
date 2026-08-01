@@ -19,7 +19,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
+          aws-region: ap-south-1
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -28,7 +28,7 @@ jobs:
       - name: Build, Tag, and Push Docker Image to Amazon ECR
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: tanusha-k8s-project
+          REPOSITORY: venkat-k8s
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
@@ -52,15 +52,15 @@ jobs:
       - name: Configure kubectl for EKS
         run: |
           aws eks update-kubeconfig \
-            --region us-west-2 \
-            --name Tanusha-ekscluster
+            --region ap-south-1 \
+            --name Sample-EKS-Clustrer
 
       - name: Replace image tag
         run: |
-          sed -i "s|IMAGE_TAG|${{ github.sha }}|g" K8/deployment.yaml
+          sed -i "s|IMAGE_TAG|${{ github.sha }}|g" K8s/deployment.yaml
 
       - name: Deploy to EKS
         run: |
-          kubectl apply -f K8/deployment.yaml
-          kubectl apply -f K8/service.yaml
-          kubectl apply -f K8/ingress.yaml
+          kubectl apply -f K8s/deployment.yaml
+          kubectl apply -f K8s/service.yaml
+          kubectl apply -f K8s/ingress.yaml
